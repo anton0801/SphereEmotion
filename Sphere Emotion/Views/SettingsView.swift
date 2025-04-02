@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @EnvironmentObject var authViewModel: AuthViewModel
     @EnvironmentObject var moodData: MoodData
     @State private var happyColor: Color = Color(hex: "#FF69B4")
     @State private var sadColor: Color = Color(hex: "#8A2BE2")
@@ -203,9 +204,59 @@ struct SettingsView: View {
                             )
                             .padding(.horizontal)
                             .padding(.vertical, 5)
+                            
                         }
                     }
                     
+                    
+                    
+                    VStack(alignment: .leading) {
+                        Text("Account Actions")
+                            .font(.system(size: 24, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+                            .padding(.top, 20)
+                        
+                        // Кнопка Sign Out
+                        Button(action: {
+                            // authViewModel.signOut()
+                            authViewModel.isAuthenticated = false
+                            UserDefaults.standard.set(nil, forKey: "email")
+                            UserDefaults.standard.set(nil, forKey: "password")
+                        }) {
+                            Text("Sign Out")
+                                .font(.system(size: 18, weight: .bold, design: .rounded))
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(
+                                    Capsule()
+                                        .fill(Color(hex: "#FF4500")) // Красный цвет для выхода
+                                )
+                                .padding(.horizontal, 50)
+                        }
+                        .padding(.vertical, 5)
+                        
+                        // Кнопка Remove Account
+                        Button(action: {
+                            // showingRemoveAccountConfirmation = true
+                            authViewModel.isAuthenticated = false
+                            UserDefaults.standard.set(nil, forKey: "email")
+                            UserDefaults.standard.set(nil, forKey: "password")
+                        }) {
+                            Text("Remove Account")
+                                .font(.system(size: 18, weight: .bold, design: .rounded))
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(
+                                    Capsule()
+                                        .fill(Color.red) // Ярко-красный для удаления
+                                )
+                                .padding(.horizontal, 50)
+                        }
+                        .padding(.vertical, 5)
+                        
+                    }
                     
                 }
                 
@@ -290,5 +341,6 @@ struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         SettingsView()
             .environmentObject(MoodData())
+            .environmentObject(AuthViewModel())
     }
 }

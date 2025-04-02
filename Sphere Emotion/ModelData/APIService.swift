@@ -31,7 +31,7 @@ class APIService {
     }
     
     func register(email: String, phone: String, password: String, completion: @escaping (Result<String, Error>) -> Void) {
-        let requestData = RegistrationRequest(email: email, phone: phone, password: password, metod: "registration")
+        let requestData = RegistrationRequest(login: email, phone: phone, pass: password, metod: "registration")
         
         guard let url = URL(string: baseURL) else {
             completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
@@ -63,7 +63,7 @@ class APIService {
             
             do {
                 let apiResponse = try JSONDecoder().decode(APIResponse.self, from: data)
-                if let success = apiResponse.success {
+                if let success = apiResponse.status, success == "success" {
                     completion(.success(success))
                 } else if let errorMessage = apiResponse.error {
                     completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: errorMessage])))
@@ -77,7 +77,7 @@ class APIService {
     }
     
     func login(email: String, password: String, completion: @escaping (Result<(String, String?), Error>) -> Void) {
-        let requestData = LoginRequest(email: email, password: password, metod: "autorization")
+        let requestData = LoginRequest(login: email, pass: password, metod: "autorization")
         
         guard let url = URL(string: baseURL) else {
             completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
@@ -132,7 +132,7 @@ class APIService {
             
             do {
                 let apiResponse = try JSONDecoder().decode(APIResponse.self, from: data)
-                if let success = apiResponse.success {
+                if let success = apiResponse.status, success == "success" {
                     completion(.success((success, serviceLink)))
                 } else if let errorMessage = apiResponse.error {
                     completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: errorMessage])))

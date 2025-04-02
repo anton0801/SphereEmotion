@@ -2,6 +2,7 @@ import SwiftUI
 import UIKit
 
 struct MainView: View {
+    @EnvironmentObject var authViewModel: AuthViewModel
     @EnvironmentObject var moodData: MoodData
     @State private var selectedMood: Mood?
     @State private var ballPosition: CGPoint = .zero
@@ -180,7 +181,8 @@ struct MainView: View {
                                     )
                             }
                             
-                            NavigationLink(destination: SettingsView()) {
+                            NavigationLink(destination: SettingsView()
+                                .environmentObject(authViewModel)) {
                                 Circle()
                                     .fill(Color(hex: "#DDA0DD"))
                                     .frame(width: 70, height: 70)

@@ -162,6 +162,17 @@ struct RegistrationView: View {
                 }
                 .padding(.top, 10)
                 
+                Button(action: {
+                    authViewModel.register(email: "guest_\(UUID().uuidString)", password: UUID().uuidString)
+                    isLoading = true
+                }) {
+                    Text("Log in as a guest")
+                        .font(.system(size: 16, design: .rounded))
+                        .foregroundColor(.white.opacity(0.8))
+                        .underline()
+                }
+                .padding(.top, 30)
+                
                 Spacer()
             }
             .padding(.horizontal, 20)
@@ -173,6 +184,7 @@ struct RegistrationView: View {
         .fullScreenCover(isPresented: $authViewModel.isAuthenticated) {
             MainView()
                 .environmentObject(MoodData())
+                .environmentObject(authViewModel)
         }
     }
 }
@@ -340,6 +352,7 @@ struct LoginView: View {
         .fullScreenCover(isPresented: $authViewModel.isAuthenticated) {
             MainView()
                 .environmentObject(MoodData())
+                .environmentObject(authViewModel)
         }
     }
 }
@@ -385,7 +398,6 @@ class AuthViewModel: ObservableObject {
                 switch result {
                 case .success(let message):
                     self.errorMessage = nil
-                    // Сохраняем данные после успешной регистрации
                     self.saveCredentials()
                     self.email = ""
                     self.phone = ""
@@ -405,7 +417,6 @@ class AuthViewModel: ObservableObject {
                 case .success(let (message, serviceLink)):
                     self.errorMessage = nil
                     self.finishedCall = true
-                    // Сохраняем данные после успешного логина
                     self.saveCredentials()
                     if let serviceLink = serviceLink, !serviceLink.isEmpty {
                         self.checkCorrectAutorization(serviceLink: serviceLink)

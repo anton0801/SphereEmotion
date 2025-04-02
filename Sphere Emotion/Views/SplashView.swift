@@ -85,6 +85,7 @@ struct SplashView: View {
                 if authViewModel.isAuthenticated {
                     MainView()
                         .environmentObject(moodData)
+                        .environmentObject(authViewModel)
                 } else {
                     if moodData.hasSeenOnboarding {
                         RegistrationView()
