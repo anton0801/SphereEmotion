@@ -7,6 +7,9 @@ struct MainView: View {
     @State private var ballPosition: CGPoint = .zero
     @State private var showBallAnimation = false
     @State private var showConfetti = false
+    @State private var touchParticles: [TouchParticle] = []
+    
+    @State private var showDailyReward = false
     
     var moods: [Mood] {
         [
@@ -20,17 +23,8 @@ struct MainView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                // Gradient background
-                LinearGradient(gradient: Gradient(colors: [Color(hex: "#FF69B4"), Color(hex: "#8A2BE2")]),
-                               startPoint: .top, endPoint: .bottom)
-                    .ignoresSafeArea()
+                InteractiveBackground(touchParticles: $touchParticles)
                 
-                // Floating background balls
-                ForEach(0..<5) { _ in
-                    FloatingBall()
-                }
-                
-                // Ball animation when mood is selected
                 if showBallAnimation, let mood = selectedMood {
                     Circle()
                         .fill(mood.uiColor)
@@ -48,14 +42,11 @@ struct MainView: View {
                         }
                 }
                 
-                // Confetti animation
                 if showConfetti {
                     ConfettiView()
                 }
                 
-                // Main content
                 VStack {
-                    // Streak and points display
                     HStack {
                         Text("Streak: \(moodData.streak) days")
                             .font(.system(size: 20, weight: .bold, design: .rounded))
@@ -92,25 +83,25 @@ struct MainView: View {
                         HStack(spacing: 20) {
                             ForEach(moods) { mood in
                                 Button(action: {
-                                    selectedMood = mood
-                                    showBallAnimation = true
-                                    ballPosition = CGPoint(x: UIScreen.main.bounds.width / 2, y: 0)
-                                    // Save mood to calendar
-                                    let today = Calendar.current.startOfDay(for: Date())
-                                    let previousStreak = moodData.streak
-                                    moodData.moods[today] = mood
-                                    // Check for streak milestones
-                                    if moodData.streak > previousStreak && [3, 7, 14].contains(moodData.streak) {
-                                        showConfetti = true
-                                        let generator = UINotificationFeedbackGenerator()
-                                        generator.notificationOccurred(.success)
-                                    }
-                                    // Haptic feedback
-                                    let generator = UIImpactFeedbackGenerator(style: .medium)
-                                    generator.impactOccurred()
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                        showBallAnimation = false
-                                    }
+//                                    selectedMood = mood
+//                                    showBallAnimation = true
+//                                    ballPosition = CGPoint(x: UIScreen.main.bounds.width / 2, y: 0)
+//                                    // Save mood to calendar
+//                                    let today = Calendar.current.startOfDay(for: Date())
+//                                    let previousStreak = moodData.streak
+//                                    moodData.moods[today] = mood
+//                                    // Check for streak milestones
+//                                    if moodData.streak > previousStreak && [3, 7, 14].contains(moodData.streak) {
+//                                        showConfetti = true
+//                                        let generator = UINotificationFeedbackGenerator()
+//                                        generator.notificationOccurred(.success)
+//                                    }
+//                                    // Haptic feedback
+//                                    let generator = UIImpactFeedbackGenerator(style: .medium)
+//                                    generator.impactOccurred()
+//                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+//                                        showBallAnimation = false
+//                                    }
                                 }) {
                                     Circle()
                                         .fill(mood.uiColor)
@@ -136,7 +127,6 @@ struct MainView: View {
                     
                     Spacer()
                     
-                    // Navigation buttons (as balls)
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 30) {
                             NavigationLink(destination: CalendarView()) {
@@ -162,23 +152,6 @@ struct MainView: View {
                                     .frame(width: 70, height: 70)
                                     .overlay(
                                         Image(systemName: "chart.pie.fill")
-                                            .foregroundColor(.white)
-                                            .font(.system(size: 30))
-                                    )
-                                    .shadow(radius: 5)
-                                    .overlay(
-                                        Circle()
-                                            .stroke(Color.white.opacity(0.5), lineWidth: 3)
-                                            .blur(radius: 5)
-                                    )
-                            }
-                            
-                            NavigationLink(destination: MoodPyramidView()) {
-                                Circle()
-                                    .fill(Color(hex: "#FF1493"))
-                                    .frame(width: 70, height: 70)
-                                    .overlay(
-                                        Image(systemName: "pyramid.fill")
                                             .foregroundColor(.white)
                                             .font(.system(size: 30))
                                     )
@@ -223,16 +196,93 @@ struct MainView: View {
                                             .blur(radius: 5)
                                     )
                             }
+                            
+                            NavigationLink(destination: MoodPyramidView()) {
+                                Circle()
+                                    .fill(Color(hex: "#FF1493"))
+                                    .frame(width: 70, height: 70)
+                                    .overlay(
+                                        Image(systemName: "pyramid.fill")
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 30))
+                                    )
+                                    .shadow(radius: 5)
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.5), lineWidth: 3)
+                                            .blur(radius: 5)
+                                    )
+                            }
+                            
+                            NavigationLink(destination: MoodInsightsView()) {
+                                Circle()
+                                    .fill(Color(hex: "#00CED1"))
+                                    .frame(width: 70, height: 70)
+                                    .overlay(
+                                        Image(systemName: "lightbulb.fill")
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 30))
+                                    )
+                                    .shadow(radius: 5)
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.5), lineWidth: 3)
+                                            .blur(radius: 5)
+                                    )
+                            }
+                            
+                            NavigationLink(destination: MoodJournalView()) {
+                                Circle()
+                                    .fill(Color(hex: "#4682B4"))
+                                    .frame(width: 70, height: 70)
+                                    .overlay(
+                                        Image(systemName: "note.text")
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 30))
+                                    )
+                                    .shadow(radius: 5)
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.5), lineWidth: 3)
+                                            .blur(radius: 5)
+                                    )
+                            }
+                            
+                            NavigationLink(destination: ChallengesView()) {
+                                Circle()
+                                    .fill(Color(hex: "#FF4500"))
+                                    .frame(width: 70, height: 70)
+                                    .overlay(
+                                        Image(systemName: "flag.fill")
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 30))
+                                    )
+                                    .shadow(radius: 5)
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.5), lineWidth: 3)
+                                            .blur(radius: 5)
+                                    )
+                            }
                         }
-                        .padding(.leading)
                     }
                     .padding(.bottom, 50)
-                    
+                }
+                
+                if showDailyReward {
+                    DailyRewardView(showReward: $showDailyReward)
+                }
+                
+            }
+            .onAppear {
+                if !moodData.dailyRewardClaimed {
+                    showDailyReward = true
                 }
             }
         }
     }
 }
+
 
 // Floating background ball
 struct FloatingBall: View {

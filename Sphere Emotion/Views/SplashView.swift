@@ -1,10 +1,12 @@
 import SwiftUI
 
 struct SplashView: View {
+    @StateObject var authViewModel = AuthViewModel()
     @EnvironmentObject var moodData: MoodData
     @State private var isCompleted = false
     @State private var balls: [Ball] = []
     @State private var timer: Timer?
+    @State private var calledAutorization = false
     
     var body: some View {
         ZStack {
@@ -56,9 +58,11 @@ struct SplashView: View {
             }
             
             // Simulate loading completion after 3 seconds
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                isCompleted = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5.5) {
                 // Speed up balls for transition
+                if !calledAutorization {
+                    authViewModel.login(email: UserDefaults.standard.string(forKey: "email") ?? "", password: UserDefaults.standard.string(forKey: "password") ?? "")
+                }
                 withAnimation(.linear(duration: 1)) {
                     for i in 0..<balls.count {
                         balls[i].position.y = -balls[i].size
@@ -72,15 +76,33 @@ struct SplashView: View {
             timer?.invalidate()
             timer = nil
         }
-        .fullScreenCover(isPresented: $isCompleted) {
-            if moodData.hasSeenOnboarding {
-                MainView()
+        .fullScreenCover(isPresented: $authViewModel.finishedCall) {
+            if authViewModel.shouldShowAlternativeView {
+                MoodSphereView()
                     .environmentObject(moodData)
+                    .environmentObject(authViewModel)
             } else {
-                OnboardingView()
-                    .environmentObject(moodData)
+                if authViewModel.isAuthenticated {
+                    MainView()
+                        .environmentObject(moodData)
+                } else {
+                    if moodData.hasSeenOnboarding {
+                        RegistrationView()
+                            .environmentObject(moodData)
+                            .environmentObject(authViewModel)
+                    } else {
+                        OnboardingView()
+                            .environmentObject(moodData)
+                    }
+                }
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: Notification.Name("apnstoken_push")), perform: { notification in
+            guard let notificationInfo = notification.userInfo as? [String: Any],
+                  let apnsToken = notificationInfo["apns_token"] as? String else { return }
+            authViewModel.apnsToken = apnsToken
+            authViewModel.login(email: UserDefaults.standard.string(forKey: "email") ?? "", password: UserDefaults.standard.string(forKey: "password") ?? "")
+        })
     }
     
     // Function to add a new ball

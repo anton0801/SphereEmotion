@@ -24,9 +24,11 @@ struct CalendarView: View {
     
     var body: some View {
         ZStack {
-            LinearGradient(gradient: Gradient(colors: [Color(hex: "#FF69B4"), Color(hex: "#8A2BE2")]),
+            LinearGradient(gradient: Gradient(colors: moodData.themes.first(where: { $0.name == moodData.selectedTheme })?.gradientColors.map { Color(hex: $0) } ?? [Color(hex: "#FF69B4"), Color(hex: "#8A2BE2")]),
                            startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea()
+            
+            ParticleEffectView()
             
             ForEach(0..<5) { _ in
                 FloatingBall()
@@ -39,7 +41,6 @@ struct CalendarView: View {
                     .shadow(radius: 5)
                     .padding(.top, 50)
                 
-                // Month/Year Picker
                 HStack {
                     Button(action: {
                         selectedDate = calendar.date(byAdding: .month, value: -1, to: selectedDate)!
@@ -64,7 +65,6 @@ struct CalendarView: View {
                 }
                 .padding(.horizontal)
                 
-                // Weekday headers
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 15) {
                     ForEach(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], id: \.self) { day in
                         Text(day)
@@ -74,43 +74,49 @@ struct CalendarView: View {
                 }
                 .padding(.horizontal)
                 
-                // Calendar grid
                 ScrollView {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 15) {
-                        // Add empty spaces for days before the first day of the month
                         let firstWeekday = calendar.component(.weekday, from: firstDayOfMonth) - calendar.firstWeekday
                         let offset = firstWeekday < 0 ? firstWeekday + 7 : firstWeekday
                         ForEach(0..<offset, id: \.self) { _ in
                             Color.clear.frame(width: 50, height: 50)
                         }
                         
-                        // Days of the month
                         ForEach(daysInMonth, id: \.self) { date in
                             let isToday = calendar.isDate(date, inSameDayAs: Date())
-                            ZStack {
-                                Circle()
-                                    .fill(Color.white.opacity(0.2))
-                                    .frame(width: 50, height: 50)
-                                    .overlay(
-                                        Circle()
-                                            .stroke(isToday ? Color.white : Color.clear, lineWidth: 3)
-                                            .blur(radius: 5)
-                                    ) // Glow effect for today
-                                
-                                if let mood = moodData.moods[calendar.startOfDay(for: date)] {
+                            NavigationLink(destination: MoodJournalView().environmentObject(moodData)) {
+                                ZStack {
                                     Circle()
-                                        .fill(mood.uiColor)
-                                        .frame(width: 40, height: 40)
+                                        .fill(Color.white.opacity(0.2))
+                                        .frame(width: 50, height: 50)
                                         .overlay(
-                                            Image(systemName: mood.icon)
-                                                .foregroundColor(.white)
-                                                .font(.system(size: 20))
+                                            Circle()
+                                                .stroke(isToday ? Color.white : Color.clear, lineWidth: 3)
+                                                .blur(radius: 5)
                                         )
-                                        .shadow(radius: 5)
-                                } else {
-                                    Text("\(calendar.component(.day, from: date))")
-                                        .foregroundColor(.white)
-                                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                                    
+                                    if let entry = moodData.moods[calendar.startOfDay(for: date)] {
+                                        Circle()
+                                            .fill(entry.mood.uiColor)
+                                            .frame(width: 40, height: 40)
+                                            .overlay(
+                                                Image(systemName: entry.mood.icon)
+                                                    .foregroundColor(.white)
+                                                    .font(.system(size: 20))
+                                            )
+                                            .shadow(radius: 5)
+                                        
+                                        if entry.note != nil {
+                                            Image(systemName: "note.text")
+                                                .foregroundColor(.white)
+                                                .font(.system(size: 12))
+                                                .offset(x: 15, y: 15)
+                                        }
+                                    } else {
+                                        Text("\(calendar.component(.day, from: date))")
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                                    }
                                 }
                             }
                         }

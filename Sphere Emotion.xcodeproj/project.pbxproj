@@ -10,9 +10,22 @@
 		8FF8278B2D91FA0F0001A80B /* Sphere Emotion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Sphere Emotion.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		8FF82C4E2D9C554B0001A80B /* Exceptions for "Sphere Emotion" folder in "Sphere Emotion" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Sphere-Emotion-Info.plist",
+			);
+			target = 8FF8278A2D91FA0F0001A80B /* Sphere Emotion */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		8FF8278D2D91FA0F0001A80B /* Sphere Emotion */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				8FF82C4E2D9C554B0001A80B /* Exceptions for "Sphere Emotion" folder in "Sphere Emotion" target */,
+			);
 			path = "Sphere Emotion";
 			sourceTree = "<group>";
 		};
@@ -250,6 +263,8 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Sphere Emotion/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Sphere-Emotion-Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Allow to this use your camera to scan your emotion!";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -288,6 +303,8 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Sphere Emotion/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Sphere-Emotion-Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Allow to this use your camera to scan your emotion!";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

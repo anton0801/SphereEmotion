@@ -10,8 +10,8 @@ struct MoodPyramidView: View {
     // Статистика настроений
     var moodStats: [Mood: Int] {
         var stats: [Mood: Int] = [:]
-        for mood in moodData.moods.values {
-            stats[mood, default: 0] += 1
+        for entry in moodData.moods.values {
+            stats[entry.mood, default: 0] += 1 // Используем entry.mood вместо entry
         }
         return stats
     }
